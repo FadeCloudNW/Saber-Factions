@@ -36,15 +36,16 @@ public class CmdMoneyDeposit extends FCommand {
     public void perform(CommandContext context) {
         double amount = context.argAsDouble(0, 0d);
         EconomyParticipator faction = context.argAsFaction(1, context.faction);
+
         if (faction == null) {
             return;
         }
+
         boolean success = Econ.transferMoney(context.fPlayer, context.fPlayer, faction, amount);
 
         if (success && Conf.logMoneyTransactions) {
             FactionsPlugin.getInstance().log(ChatColor.stripColor(FactionsPlugin.getInstance().txt.parse(TL.COMMAND_MONEYDEPOSIT_DEPOSITED.toString(), context.fPlayer.getName(), Econ.moneyString(amount), faction.describeTo(null))));
             FactionsPlugin.instance.logFactionEvent(context.faction, FLogType.BANK_EDIT, context.fPlayer.getName(), ChatColor.GREEN + ChatColor.BOLD.toString() + "DEPOSITED", amount + "");
-
         }
     }
 

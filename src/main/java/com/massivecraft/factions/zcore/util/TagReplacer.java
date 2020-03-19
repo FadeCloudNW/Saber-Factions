@@ -260,8 +260,6 @@ public enum TagReplacer {
                 return String.valueOf(fac.getBannedPlayers().size());
             case FACTION_STRIKES:
                 return String.valueOf(fac.getStrikes());
-            case FACTION_POINTS:
-                return String.valueOf(fac.getPoints());
 
             default:
         }

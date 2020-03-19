@@ -96,7 +96,6 @@ public enum FactionTag implements Tag {
         }
     }),
     FACTION_STRIKES("{faction-strikes}",(fac) -> String.valueOf(fac.getStrikes())),
-    FACTION_POINTS("{faction-points}", (fac) -> String.valueOf(fac.getPoints())),
     FACTION_SIZE("{members}", (fac) -> String.valueOf(fac.getFPlayers().size())),
     FACTION_KILLS("{faction-kills}", (fac) -> String.valueOf(fac.getKills())),
     FACTION_DEATHS("{faction-deaths}", (fac) -> String.valueOf(fac.getDeaths())),

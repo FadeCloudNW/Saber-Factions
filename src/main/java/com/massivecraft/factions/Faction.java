@@ -3,7 +3,6 @@ package com.massivecraft.factions;
 import com.massivecraft.factions.event.FactionDisbandEvent.PlayerDisbandReason;
 import com.massivecraft.factions.iface.EconomyParticipator;
 import com.massivecraft.factions.iface.RelationParticipator;
-import com.massivecraft.factions.missions.Mission;
 import com.massivecraft.factions.struct.BanInfo;
 import com.massivecraft.factions.struct.Relation;
 import com.massivecraft.factions.struct.Role;
@@ -11,7 +10,6 @@ import com.massivecraft.factions.util.LazyLocation;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.Permissable;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
-import com.massivecraft.factions.zcore.fupgrades.UpgradeType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -26,10 +24,6 @@ public interface Faction extends EconomyParticipator {
     String getMemberRoleId();
 
     void setMemberRoleId(String roleId);
-
-    String getGuildId();
-
-    void setGuildId(String id);
 
     String getWallNotifyChannelId();
 
@@ -54,10 +48,6 @@ public interface Faction extends EconomyParticipator {
     String getFactionChatChannelId();
 
     void setFactionChatChannelId(String channelId);
-
-    String getDiscord();
-
-    void setDiscord(String link);
 
     void checkPerms();
 
@@ -92,10 +82,6 @@ public interface Faction extends EconomyParticipator {
     void setWeeWoo(boolean weeWoo);
 
     boolean altInvited(FPlayer fplayer);
-
-    Map<String, Mission> getMissions();
-
-    List<String> getCompletedMissions();
 
     void deinviteAlt(FPlayer alt);
 
@@ -153,17 +139,9 @@ public interface Faction extends EconomyParticipator {
 
     void deinvite(FPlayer fplayer);
 
-    void setUpgrade(UpgradeType upgrade, int level);
-
-    int getUpgrade(UpgradeType upgrade);
-
     boolean isInvited(FPlayer fplayer);
 
     void ban(FPlayer target, FPlayer banner);
-
-    int getPoints();
-
-    void setPoints(int points);
 
     int getStrikes();
 

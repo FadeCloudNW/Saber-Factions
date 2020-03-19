@@ -12,7 +12,6 @@ import com.massivecraft.factions.cmd.configsf.CmdConvertConfig;
 import com.massivecraft.factions.cmd.econ.CmdMoney;
 import com.massivecraft.factions.cmd.grace.CmdGrace;
 import com.massivecraft.factions.cmd.logout.CmdLogout;
-import com.massivecraft.factions.cmd.points.CmdPoints;
 import com.massivecraft.factions.cmd.relational.CmdRelationAlly;
 import com.massivecraft.factions.cmd.relational.CmdRelationEnemy;
 import com.massivecraft.factions.cmd.relational.CmdRelationNeutral;
@@ -22,11 +21,6 @@ import com.massivecraft.factions.cmd.roles.CmdDemote;
 import com.massivecraft.factions.cmd.roles.CmdPromote;
 import com.massivecraft.factions.cmd.tnt.CmdTnt;
 import com.massivecraft.factions.cmd.tnt.CmdTntFill;
-import com.massivecraft.factions.cmd.wild.CmdWild;
-import com.massivecraft.factions.discord.CmdInviteBot;
-import com.massivecraft.factions.discord.CmdSetGuild;
-import com.massivecraft.factions.missions.CmdMissions;
-import com.massivecraft.factions.shop.CmdShop;
 import com.massivecraft.factions.zcore.util.TL;
 import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
@@ -128,7 +122,6 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
     public CmdCheckpoint cmdCheckpoint = new CmdCheckpoint();
     public CmdTnt cmdTnt = new CmdTnt();
     public CmdNear cmdNear = new CmdNear();
-    public CmdUpgrades cmdUpgrades = new CmdUpgrades();
     public CmdVault cmdVault = new CmdVault();
     public CmdGetVault cmdGetVault = new CmdGetVault();
     public CmdFly cmdFly = new CmdFly();
@@ -148,33 +141,21 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
     public CmdInventorySee cmdInventorySee = new CmdInventorySee();
     public CmdFGlobal cmdFGlobal = new CmdFGlobal();
     public CmdViewChest cmdViewChest = new CmdViewChest();
-    public CmdPoints cmdPoints = new CmdPoints();
     public CmdLogout cmdLogout = new CmdLogout();
-    public CmdShop cmdShop = new CmdShop();
-    public CmdMissions cmdMissions = new CmdMissions();
     public CmdStrikes cmdStrikes = new CmdStrikes();
     public CmdCheck cmdCheck = new CmdCheck();
     public CmdWeeWoo cmdWeeWoo = new CmdWeeWoo();
-    public CmdWild cmdWild = new CmdWild();
     public CmdConvertConfig cmdConvertConfig = new CmdConvertConfig();
     public CmdSpawnerLock cmdSpawnerLock = new CmdSpawnerLock();
-    public CmdSetDiscord cmdSetDiscord = new CmdSetDiscord();
-    public CmdSeeDiscord cmdSeeDiscord = new CmdSeeDiscord();
-    public CmdInviteBot cmdInviteBot = new CmdInviteBot();
-    public CmdSetGuild cmdSetGuild = new CmdSetGuild();
-    public CmdDiscord cmdDiscord = new CmdDiscord();
     public CmdDebug cmdDebug = new CmdDebug();
     public CmdDrain cmdDrain = new CmdDrain();
     public CmdLookup cmdLookup = new CmdLookup();
     public CmdAudit cmdAudit = new CmdAudit();
     public CmdReserve cmdReserve = new CmdReserve();
     //Variables to know if we already setup certain sub commands
-    public Boolean discordEnabled = false;
     public Boolean checkEnabled = false;
     public Boolean missionsEnabled = false;
-    public Boolean fShopEnabled = false;
     public Boolean invSeeEnabled = false;
-    public Boolean fPointsEnabled = false;
     public Boolean fAltsEnabled = false;
     public Boolean fGraceEnabled = false;
     public Boolean fFocusEnabled = false;
@@ -182,7 +163,6 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
     public Boolean fPayPalEnabled = false;
     public Boolean coreProtectEnabled = false;
     public Boolean internalFTOPEnabled = false;
-    public Boolean fWildEnabled = false;
     public Boolean fAuditEnabled = false;
 
     public FCmdRoot() {
@@ -278,7 +258,6 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
         this.addSubCommand(this.cmdCheckpoint);
         this.addSubCommand(this.cmdTnt);
         this.addSubCommand(this.cmdNear);
-        this.addSubCommand(this.cmdUpgrades);
         this.addSubCommand(this.cmdVault);
         this.addSubCommand(this.cmdGetVault);
         this.addSubCommand(this.cmdColeader);
@@ -307,15 +286,6 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
      * Add sub commands to the root if they are enabled
      */
     public void addVariableCommands() {
-        //Discord
-        if (Conf.useDiscordSystem && !discordEnabled) {
-            this.addSubCommand(this.cmdInviteBot);
-            this.addSubCommand(this.cmdSetGuild);
-            this.addSubCommand(this.cmdSetDiscord);
-            this.addSubCommand(this.cmdSeeDiscord);
-            this.addSubCommand(this.cmdDiscord);
-            discordEnabled = true;
-        }
         //Reserve
         if (Conf.useReserveSystem) {
             this.addSubCommand(this.cmdReserve);
@@ -356,25 +326,9 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
         }
 
         //Other
-        if (FactionsPlugin.getInstance().getConfig().getBoolean("Wild.Enabled", false) && !fWildEnabled) {
-            this.addSubCommand(this.cmdWild);
-            fWildEnabled = true;
-        }
-        if (FactionsPlugin.getInstance().getConfig().getBoolean("Missions-Enabled", false) && !missionsEnabled) {
-            this.addSubCommand(this.cmdMissions);
-            missionsEnabled = true;
-        }
-        if (FactionsPlugin.getInstance().getConfig().getBoolean("F-Shop.Enabled", false) && !fShopEnabled) {
-            this.addSubCommand(this.cmdShop);
-            fShopEnabled = true;
-        }
         if (FactionsPlugin.getInstance().getConfig().getBoolean("f-inventory-see.Enabled", false) && !invSeeEnabled) {
             this.addSubCommand(this.cmdInventorySee);
             invSeeEnabled = true;
-        }
-        if (FactionsPlugin.getInstance().getConfig().getBoolean("f-points.Enabled", false) && !fPointsEnabled) {
-            this.addSubCommand(this.cmdPoints);
-            fPointsEnabled = true;
         }
         if (FactionsPlugin.getInstance().getConfig().getBoolean("f-alts.Enabled", false) && !fAltsEnabled) {
             this.addSubCommand(this.cmdAlts);

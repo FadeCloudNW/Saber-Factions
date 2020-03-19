@@ -70,8 +70,16 @@ public class CmdInviteAlt extends FCommand {
             return;
         }
 
+        int altLimit = Conf.factionAltMemberLimit;
+
+        if (altLimit > 0 && context.faction.getAltPlayers().size() >= altLimit) {
+            context.msg(TL.COMMAND_JOIN_ATLIMIT, context.faction.getTag(context.fPlayer), altLimit, context.fPlayer.describeTo(context.fPlayer, false));
+            return;
+        }
+
         context.faction.deinvite(target);
         context.faction.altInvite(target);
+
         if (!target.isOnline()) {
             return;
         }

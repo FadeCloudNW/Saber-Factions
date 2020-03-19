@@ -37,19 +37,25 @@ public class CmdKick extends FCommand {
     @Override
     public void perform(CommandContext context) {
         FPlayer toKick = context.argIsSet(0) ? context.argAsBestFPlayerMatch(0) : null;
+
         if (toKick == null) {
             FancyMessage msg = new FancyMessage(TL.COMMAND_KICK_CANDIDATES.toString()).color(ChatColor.GOLD);
+
             for (FPlayer player : context.faction.getFPlayersWhereRole(Role.NORMAL)) {
                 String s = player.getName();
                 msg.then(s + " ").color(ChatColor.WHITE).tooltip(TL.COMMAND_KICK_CLICKTOKICK.toString() + s).command("/" + Conf.baseCommandAliases.get(0) + " kick " + s);
             }
+
             if (context.fPlayer.getRole().isAtLeast(Role.COLEADER)) {
                 // For both coleader and admin, add mods.
+
                 for (FPlayer player : context.faction.getFPlayersWhereRole(Role.MODERATOR)) {
                     String s = player.getName();
                     msg.then(s + " ").color(ChatColor.GRAY).tooltip(TL.COMMAND_KICK_CLICKTOKICK.toString() + s).command("/" + Conf.baseCommandAliases.get(0) + " kick " + s);
                 }
+
                 if (context.fPlayer.getRole() == Role.LEADER) {
+
                     // Only add coleader to this for the leader.
                     for (FPlayer player : context.faction.getFPlayersWhereRole(Role.COLEADER)) {
                         String s = player.getName();
@@ -65,6 +71,12 @@ public class CmdKick extends FCommand {
         if (context.fPlayer == toKick) {
             context.msg(TL.COMMAND_KICK_SELF);
             context.msg(TL.GENERIC_YOUMAYWANT.toString() + FactionsPlugin.getInstance().cmdBase.cmdLeave.getUsageTemplate(context));
+            return;
+        }
+
+        if (toKick.isAlt()) {
+            System.out.println("3");
+            context.sendMessage("&c&l[!] &7To kick alt members: &c/f alt kick <player>");
             return;
         }
 
@@ -103,6 +115,7 @@ public class CmdKick extends FCommand {
         // trigger the leave event (cancellable) [reason:kicked]
         FPlayerLeaveEvent event = new FPlayerLeaveEvent(toKick, toKick.getFaction(), FPlayerLeaveEvent.PlayerLeaveReason.KICKED);
         Bukkit.getServer().getPluginManager().callEvent(event);
+
         if (event.isCancelled()) {
             return;
         }
@@ -118,12 +131,15 @@ public class CmdKick extends FCommand {
         if (toKickFaction != context.faction) {
             context.fPlayer.msg(TL.COMMAND_KICK_KICKS, toKick.describeTo(context.fPlayer), toKickFaction.describeTo(context.fPlayer));
         }
+
         if (Conf.logFactionKick) {
             FactionsPlugin.getInstance().log((context.sender instanceof ConsoleCommandSender ? "A console command" : context.fPlayer.getName()) + " kicked " + toKick.getName() + " from the faction: " + toKickFaction.getTag());
         }
+
         if (toKick.getRole() == Role.LEADER) {
             toKickFaction.promoteNewLeader();
         }
+
         FactionsPlugin.instance.logFactionEvent(toKickFaction, FLogType.INVITES, context.fPlayer.getName(), CC.Red + "kicked", toKick.getName());
         toKickFaction.deinvite(toKick);
         toKick.resetFactionData();

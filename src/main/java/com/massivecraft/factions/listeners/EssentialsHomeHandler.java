@@ -35,10 +35,12 @@ public class EssentialsHomeHandler implements Listener {
         if (homes == null || homes.isEmpty()) {
             return;
         }
+
         for (String homeName : user.getHomes()) {
             Location loc = user.getHome(homeName);
             FLocation floc = new FLocation(loc);
             Faction factionAt = Board.getInstance().getFactionAt(floc);
+
             if (factionAt.equals(faction) && factionAt.isNormal()) {
                 user.delHome(homeName);
                 FactionsPlugin.getInstance().log(Level.INFO, "Removing home %s, player %s, in territory of %s", homeName, event.getfPlayer().getName(), faction.getTag());

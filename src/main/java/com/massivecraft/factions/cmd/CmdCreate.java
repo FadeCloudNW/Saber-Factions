@@ -1,7 +1,6 @@
 package com.massivecraft.factions.cmd;
 
 import com.massivecraft.factions.*;
-import com.massivecraft.factions.discord.Discord;
 import com.massivecraft.factions.event.FPlayerJoinEvent;
 import com.massivecraft.factions.event.FactionCreateEvent;
 import com.massivecraft.factions.integration.Econ;
@@ -9,10 +8,7 @@ import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.struct.Role;
 import com.massivecraft.factions.util.MiscUtil;
 import com.massivecraft.factions.zcore.util.TL;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 
@@ -26,9 +22,7 @@ public class CmdCreate extends FCommand {
     public CmdCreate() {
         super();
         this.aliases.addAll(Aliases.create);
-
         this.requiredArgs.add("faction tag");
-
         this.requirements = new CommandRequirements.Builder(Permission.CREATE)
                 .playerOnly()
                 .build();
@@ -36,10 +30,6 @@ public class CmdCreate extends FCommand {
 
     @Override
     public void perform(CommandContext context) {
-        if (Conf.restrictActionsWhenNotLinked && !context.fPlayer.discordSetup()) {
-            context.player.sendMessage(ChatColor.translateAlternateColorCodes('&', TL.DISCORD_LINK_REQUIRED.toString()));
-            return;
-        }
         String tag = context.argAsString(0);
 
         if (context.fPlayer.hasFaction()) {
@@ -101,32 +91,31 @@ public class CmdCreate extends FCommand {
                 follower.msg(TL.COMMAND_CREATE_CREATED, context.fPlayer.getName(), faction.getTag(follower));
             }
         }
-        //Discord
-        try {
-            if (Discord.useDiscord && context.fPlayer.discordSetup() && Discord.isInMainGuild(context.fPlayer.discordUser()) && Discord.mainGuild != null) {
-                Member m = Discord.mainGuild.getMember(context.fPlayer.discordUser());
-                if (Conf.factionRoles) {
-                    Discord.mainGuild.getController().addSingleRoleToMember(m, Discord.createFactionRole(faction.getTag())).queue();
-                }
-                if (Conf.leaderRoles && Discord.leader != null) {
-                    Discord.mainGuild.getController().addSingleRoleToMember(m, Discord.leader).queue();
-                }
-                if (Conf.factionDiscordTags) {
-                    Discord.mainGuild.getController().setNickname(m, Discord.getNicknameString(context.fPlayer)).queue();
-                }
-            }
-        } catch (HierarchyException e) {
-            System.out.print(e.getMessage());
+
+        if (Conf.econEnabled) {
+            Econ.setBalance(faction.getAccountId(), Conf.econFactionStartingBalance);
         }
-        //End Discord
-        context.msg(TL.COMMAND_CREATE_YOUSHOULD, FactionsPlugin.getInstance().cmdBase.cmdDescription.getUsageTemplate(context));
-        if (Conf.econEnabled) Econ.setBalance(faction.getAccountId(), Conf.econFactionStartingBalance);
-        if (Conf.logFactionCreate)
+
+        if (Conf.logFactionCreate) {
             FactionsPlugin.getInstance().log(context.fPlayer.getName() + TL.COMMAND_CREATE_CREATEDLOG.toString() + tag);
-        if (FactionsPlugin.getInstance().getConfig().getBoolean("fpaypal.Enabled"))
-            context.msg(TL.COMMAND_PAYPALSET_CREATED);
-        if (Conf.useCustomDefaultPermissions) faction.setDefaultPerms();
-        if (Conf.usePermissionHints) context.msg(TL.COMMAND_HINT_PERMISSION);
+        }
+
+        if (Conf.useCustomDefaultPermissions) {
+            faction.setDefaultPerms();
+        }
+
+        if (Conf.usePermissionHints) {
+            context.msg(TL.COMMAND_HINT_PERMISSION);
+        }
+
+        context.sendMessage("");
+        context.sendMessage(" &c&l*** &f&lYOUR FACTION HAS BEEN CREATED! &c&l***");
+        context.sendMessage("&cYou are now the proud leader of &f&n" + tag);
+        context.sendMessage("");
+        context.sendMessage("&7Use &n/f perm&r &7to edit member access.");
+        context.sendMessage("&7Use &n/f audit&r &7to view recent faction activity.");
+        context.sendMessage("&7Use &n/f help&R &7to review all faction commands.");
+        context.sendMessage("&c&l[!] &cYou should now also &n/f setpaypal <email>&r&c!");
     }
 
     @Override

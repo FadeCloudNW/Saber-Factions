@@ -2,6 +2,7 @@ package com.massivecraft.factions.cmd;
 
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.FactionsPlugin;
 import com.massivecraft.factions.cmd.audit.FLogType;
 import com.massivecraft.factions.struct.Permission;
@@ -20,9 +21,7 @@ public class CmdInvite extends FCommand {
     public CmdInvite() {
         super();
         this.aliases.addAll(Aliases.invite);
-
         this.requiredArgs.add("player name");
-
         this.requirements = new CommandRequirements.Builder(Permission.INVITE)
                 .playerOnly()
                 .withAction(PermissableAction.INVITE)
@@ -47,12 +46,31 @@ public class CmdInvite extends FCommand {
             return;
         }
 
+        System.out.println("----------------------- MEW");
+        System.out.println("Faction: " + context.faction.getTag());
+        System.out.println("Size:" + context.faction.getFPlayers().size() + " / " + Conf.factionMemberLimit);
+        System.out.println("Alt Size:" + context.faction.getAltPlayers().size());
+        System.out.println("Invited Size:" + context.faction.getInvites().size());
+
+        for (String name : context.faction.getInvites())
+            System.out.println("Invited - " + name);
+
+        System.out.println("----------------------- MEW");
+
         if (context.faction.isInvited(target)) {
             context.msg(TL.COMMAND_INVITE_ALREADYINVITED, target.getName());
             return;
         }
+
         if (context.faction.isBanned(target)) {
             context.msg(TL.COMMAND_INVITE_BANNED, target.getName());
+            return;
+        }
+
+        if (Conf.factionMemberLimit > 0 && context.faction.getFPlayers().size() >= getFactionMemberLimit()) {
+            context.msg(TL.COMMAND_JOIN_ATLIMIT, context.faction.getTag(context.fPlayer),
+                    getFactionMemberLimit(),
+                    context.fPlayer.describeTo(context.fPlayer, false));
             return;
         }
 
@@ -73,6 +91,10 @@ public class CmdInvite extends FCommand {
         }
         context.faction.msg(TL.COMMAND_INVITE_INVITED, context.fPlayer.describeTo(context.faction, true), target.describeTo(context.faction));
         FactionsPlugin.instance.logFactionEvent(context.faction, FLogType.INVITES, context.fPlayer.getName(), CC.Green + "invited", target.getName());
+    }
+
+    private int getFactionMemberLimit() {
+        return Conf.factionMemberLimit;
     }
 
     @Override

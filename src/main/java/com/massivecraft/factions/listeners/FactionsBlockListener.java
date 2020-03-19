@@ -70,21 +70,25 @@ public class FactionsBlockListener implements Listener {
             }
             if (!justCheck) me.msg(TL.ACTION_DENIED_WILDERNESS, action);
             return false;
+
         } else if (otherFaction.isSafeZone()) {
             if (Conf.worldGuardBuildPriority && Worldguard.getInstance().playerCanBuild(player, location)) return true;
             if (!Conf.safeZoneDenyBuild || Permission.MANAGE_SAFE_ZONE.has(player)) return true;
             if (!justCheck) me.msg(TL.ACTION_DENIED_SAFEZONE, action);
             return false;
+
         } else if (otherFaction.isWarZone()) {
             if (Conf.worldGuardBuildPriority && Worldguard.getInstance().playerCanBuild(player, location)) return true;
             if (!Conf.warZoneDenyBuild || Permission.MANAGE_WAR_ZONE.has(player)) return true;
             if (!justCheck) me.msg(TL.ACTION_DENIED_WARZONE, action);
             return false;
+
         } else if (!otherFaction.getId().equals(myFaction.getId())) { // If the faction target is not my own
             if (FactionsPlugin.getInstance().getConfig().getBoolean("hcf.raidable", false) && otherFaction.getLandRounded() > otherFaction.getPowerRounded())
                 return true;
             boolean pain = !justCheck && otherFaction.getAccess(me, PermissableAction.PAIN_BUILD) == Access.ALLOW;
             return CheckActionState(otherFaction, loc, me, PermissableAction.fromString(action), pain);
+
         } else if (otherFaction.getId().equals(myFaction.getId())) {
             boolean pain = !justCheck && myFaction.getAccess(me, PermissableAction.PAIN_BUILD) == Access.ALLOW;
             return CheckActionState(myFaction, loc, me, PermissableAction.fromString(action), pain);
@@ -136,8 +140,10 @@ public class FactionsBlockListener implements Listener {
         LogTimer logTimer = manager.getLogTimers().computeIfAbsent(player.getUniqueId(), e -> new LogTimer(player.getName(), at.getId()));
         LogTimer.Timer timer = logTimer.attemptLog(LogTimer.TimerType.SPAWNER_EDIT, subType, 0L);
         Map<MaterialData, AtomicInteger> currentCounts = (timer.getExtraData() == null) ? new HashMap<>() : ((Map) timer.getExtraData());
+
         currentCounts.computeIfAbsent(spawnerItem.getData(), e -> new AtomicInteger(0)).addAndGet(1);
         timer.setExtraData(currentCounts);
+
         if (timer.isReadyToLog(this.placeTimer)) {
             logTimer.pushLogs(at, LogTimer.TimerType.SPAWNER_EDIT);
         }
@@ -453,17 +459,6 @@ public class FactionsBlockListener implements Listener {
     }
 
     @EventHandler
-    public void entityDamage(EntityDamageEvent e) {
-        if (!Conf.gracePeriod) return;
-
-        if (e.getEntity() instanceof Player) {
-            if (e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-                e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
     public void onTNTPlace(BlockPlaceEvent e1) {
         FPlayer fp = FPlayers.getInstance().getByPlayer(e1.getPlayer());
         if (!Conf.gracePeriod) return;
@@ -508,8 +503,11 @@ public class FactionsBlockListener implements Listener {
 
         if (isSpawner) {
             Access access = fme.getFaction().getAccess(fme, PermissableAction.SPAWNER);
+            System.out.println("test");
             if (access != Access.ALLOW && fme.getRole() != Role.LEADER) {
                 fme.msg(TL.GENERIC_FPERM_NOPERMISSION, "mine spawners");
+                event.setCancelled(true);
+                return;
             }
         }
 

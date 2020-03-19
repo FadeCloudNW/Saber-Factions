@@ -9,23 +9,17 @@ import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
 import com.massivecraft.factions.zcore.util.TL;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.command.ConsoleCommandSender;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
-
 
 public class CmdDisband extends FCommand {
 
     /**
      * @author FactionsUUID Team
      */
-
-    //TODO: Add Disband Confirmation GUI
-
     private static HashMap<String, String> disbandMap = new HashMap<>();
-
 
     public CmdDisband() {
         super();
@@ -47,7 +41,6 @@ public class CmdDisband extends FCommand {
         if (!isMyFaction) {
             if (!Permission.DISBAND_ANY.has(context.sender, true)) return;
         }
-
 
         if (context.fPlayer != null && !context.fPlayer.isAdminBypassing()) {
             Access access = faction.getAccess(context.fPlayer, PermissableAction.DISBAND);
@@ -80,38 +73,46 @@ public class CmdDisband extends FCommand {
 
         if (!access) {
             if(Conf.useDisbandGUI && !context.fPlayer.isAdminBypassing() || !context.player.isOp()) {
+
                 if (!disbandMap.containsKey(context.player.getUniqueId().toString())) {
-                    new FDisbandFrame(context.faction).buildGUI(context.fPlayer);
+                    new FDisbandFrame(context.faction).buildGUI(context.fPlayer, context.faction);
                     return;
                 }
             }
         }
-
 
         // check for tnt before disbanding.
         if (!disbandMap.containsKey(context.player.getUniqueId().toString()) && faction.getTnt() > 0) {
             context.msg(TL.COMMAND_DISBAND_CONFIRM.toString().replace("{tnt}", faction.getTnt() + ""));
             disbandMap.put(context.player.getUniqueId().toString(), faction.getId());
             Bukkit.getScheduler().scheduleSyncDelayedTask(FactionsPlugin.getInstance(), () -> disbandMap.remove(context.player.getUniqueId().toString()), 200L);
+
         } else if (faction.getId().equals(disbandMap.get(context.player.getUniqueId().toString())) || faction.getTnt() == 0) {
+
             if (FactionsPlugin.getInstance().getConfig().getBoolean("faction-disband-broadcast", true)) {
+
                 for (FPlayer follower : FPlayers.getInstance().getOnlinePlayers()) {
                     String amountString = context.sender instanceof ConsoleCommandSender ? TL.GENERIC_SERVERADMIN.toString() : context.fPlayer.describeTo(follower);
+
                     if (follower.getFaction() == faction) {
                         follower.msg(TL.COMMAND_DISBAND_BROADCAST_YOURS, amountString);
+
                         if (!follower.canFlyAtLocation() && FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight")) {
                             follower.setFFlying(false, false);
                         }
+
                     } else {
                         follower.msg(TL.COMMAND_DISBAND_BROADCAST_NOTYOURS, amountString, faction.getTag(follower));
                     }
                 }
+
                 if (FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight"))
                     context.fPlayer.setFFlying(false, false);
             } else {
                 context.player.sendMessage(String.valueOf(TL.COMMAND_DISBAND_PLAYER));
             }
             faction.disband(context.player, PlayerDisbandReason.COMMAND);
+
             if (!context.fPlayer.canFlyAtLocation() && FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight")) {
                 context.fPlayer.setFFlying(false, false);
             }

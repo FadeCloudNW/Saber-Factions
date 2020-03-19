@@ -36,8 +36,10 @@ public class CmdFWarp extends FCommand {
 
         if (context.args.size() == 0) {
             new FactionWarpsFrame(context.faction).buildGUI(context.fPlayer);
+
         } else if (context.args.size() > 2) {
             context.msg(TL.COMMAND_FWARP_COMMANDFORMAT);
+
         } else {
             final String warpName = context.argAsString(0);
             final String passwordAttempt = context.argAsString(1);

@@ -294,7 +294,6 @@ public enum TL {
     COMMAND_CREATE_FORCREATE("for creating a new faction"),
     COMMAND_CREATE_ERROR("&c&l[!]&7 There was an &cinternal error&7 while trying to create your faction. &cPlease try again&7."),
     COMMAND_CREATE_CREATED("&c&l[!]&7 &c%1$s &7created a new faction &c&l%2$s"),
-    COMMAND_CREATE_YOUSHOULD("&c&l[!]&7 You should now: &c%1$s"),
     COMMAND_CREATE_CREATEDLOG(" created a new faction: "),
     COMMAND_CREATE_DESCRIPTION("Create a new faction"),
 
@@ -639,7 +638,6 @@ public enum TL {
     COMMAND_PAYPALSET_NOTEMAIL("&c&l[!] &b%1$s &7is not an email!"),
     COMMAND_PAYPALSET_DESCRIPTION("&c&l[!] &7Set the email of your faction to claim rewards."),
     COMMAND_PAYPALSEE_DESCRIPTION("&c&l[!] &7View a specific factions paypal email with &b/f <seepaypal/getpaypal> <faction>&b."),
-    COMMAND_PAYPALSET_CREATED("&c&l[!] &7Make sure to type &b/f <paypal/setpaypal> <email>&7!"),
     COMMAND_PAYPALSET_SUCCESSFUL("&c&l[!] &7Successfully set your factions email - &b%1$s&7."),
     COMMAND_PAYPALSEE_FACTION_PAYPAL("&c&l[!] &b%1$s's &7faction has their paypal set to &b%2$s&7."),
     COMMAND_PAYPALSEE_FACTION_NOTSET("&c&l[!] &b%1$s's &7paypal has not yet been set!"),

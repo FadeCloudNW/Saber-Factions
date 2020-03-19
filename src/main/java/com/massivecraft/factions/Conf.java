@@ -584,7 +584,9 @@ public class Conf {
         FactionsPlugin.getInstance().persist.save(i);
     }
 
-    public static void saveSync() { FactionsPlugin.instance.persist.saveSync(i); }
+    public static void saveSync() {
+        FactionsPlugin.instance.persist.saveSync(i);
+    }
 
     public enum Backend {
         JSON,

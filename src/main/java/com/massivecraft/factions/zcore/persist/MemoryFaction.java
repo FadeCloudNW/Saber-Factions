@@ -1,14 +1,12 @@
 package com.massivecraft.factions.zcore.persist;
 
 import com.massivecraft.factions.*;
-import com.massivecraft.factions.discord.Discord;
 import com.massivecraft.factions.event.FPlayerLeaveEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent.PlayerDisbandReason;
 import com.massivecraft.factions.iface.EconomyParticipator;
 import com.massivecraft.factions.iface.RelationParticipator;
 import com.massivecraft.factions.integration.Econ;
-import com.massivecraft.factions.missions.Mission;
 import com.massivecraft.factions.scoreboards.FTeamWrapper;
 import com.massivecraft.factions.struct.BanInfo;
 import com.massivecraft.factions.struct.Permission;
@@ -20,9 +18,7 @@ import com.massivecraft.factions.util.RelationUtil;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.Permissable;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
-import com.massivecraft.factions.zcore.fupgrades.UpgradeType;
 import com.massivecraft.factions.zcore.util.TL;
-import net.dv8tion.jda.core.entities.Member;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -41,7 +37,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     public int tnt;
     public Location checkpoint;
     public LazyLocation vault;
-    public HashMap<String, Integer> upgrades = new HashMap<>();
     protected String id = null;
     protected boolean peacefulExplosionsEnabled;
     protected boolean permanent;
@@ -75,7 +70,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     private long lastDeath;
     private int strikes = 0;
     private int points = 0;
-    private Map<String, Mission> missions = new ConcurrentHashMap<>();
     private int wallCheckMinutes;
     private int bufferCheckMinutes;
     private Map<Long, String> checks;
@@ -85,7 +79,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     private int tntBankSize;
     private int warpLimit;
     private double reinforcedArmor;
-    private List<String> completedMissions;
     protected String discord;
     private String factionChatChannelId;
     private String wallNotifyChannelId;
@@ -114,7 +107,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         this.permanent = false;
         this.money = 0.0;
         this.powerBoost = 0.0;
-        this.missions = new ConcurrentHashMap<>();
         this.foundedDate = System.currentTimeMillis();
         this.maxVaults = Conf.defaultMaxVaults;
         this.defaultRole = Role.RECRUIT;
@@ -124,7 +116,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         this.checks = new ConcurrentHashMap<>();
         this.playerWallCheckCount = new ConcurrentHashMap<>();
         this.playerBufferCheckCount = new ConcurrentHashMap<>();
-        this.completedMissions = new ArrayList<>();
         this.wallNotifyChannelId = null;
         this.bufferNotifyChannelId = null;
         this.notifyFormat = "@everyone, check %type%";
@@ -147,8 +138,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         lastPlayerLoggedOffTime = old.lastPlayerLoggedOffTime;
         money = old.money;
         powerBoost = old.powerBoost;
-        missions = new ConcurrentHashMap<>();
-        this.completedMissions = new ArrayList<>();
         relationWish = old.relationWish;
         claimOwnership = old.claimOwnership;
         fplayers = new HashSet<>();
@@ -163,14 +152,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         this.playerWallCheckCount = new ConcurrentHashMap<>();
         this.playerBufferCheckCount = new ConcurrentHashMap<>();
         resetPerms(); // Reset on new Faction so it has default values.
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
     }
 
     public int getStrikes() {
@@ -230,14 +211,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
     public boolean isWarpPassword(String warp, String password) {
         return hasWarpPassword(warp) && warpPasswords.get(warp.toLowerCase()).equals(password);
-    }
-
-    public String getDiscord() {
-        return this.discord;
-    }
-
-    public void setDiscord(String link) {
-        this.discord = link;
     }
 
     public String getPaypal() {
@@ -354,18 +327,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         // Send FPlayerLeaveEvent for each player in the faction and reset their Discord settings
         for (FPlayer fplayer : this.getFPlayers()) {
             Bukkit.getServer().getPluginManager().callEvent(new FPlayerLeaveEvent(fplayer, this, FPlayerLeaveEvent.PlayerLeaveReason.DISBAND));
-            if (Discord.useDiscord && fplayer.discordSetup() && Discord.isInMainGuild(fplayer.discordUser()) && Discord.mainGuild != null) {
-                Member m = Discord.mainGuild.getMember(fplayer.discordUser());
-                if (Conf.leaderRoles && fplayer.getRole() == Role.LEADER) {
-                    Discord.mainGuild.getController().removeSingleRoleFromMember(m, Discord.mainGuild.getRoleById(Conf.leaderRole)).queue();
-                }
-                if (Conf.factionRoles) {
-                    Discord.mainGuild.getController().removeSingleRoleFromMember(m, Objects.requireNonNull(Discord.createFactionRole(this.getTag()))).queue();
-                }
-                if (Conf.factionDiscordTags) {
-                    Discord.resetNick(fplayer);
-                }
-            }
         }
 
         if (Conf.logFactionDisband) {
@@ -457,11 +418,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         vault = new LazyLocation(vaultLocation);
     }
 
-    public int getUpgrade(UpgradeType upgrade) {
-        if (upgrades.containsKey(upgrade.toString())) return upgrades.get(upgrade.toString());
-        return 0;
-    }
-
     @Override
     public Inventory getChestInventory() {
         if (chest == null) {
@@ -473,17 +429,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
     private int getChestSize() {
         int size = FactionsPlugin.getInstance().getConfig().getInt("fchest.Default-Size");
-        switch (getUpgrade(UpgradeType.CHEST)) {
-            case 1:
-                size = FactionsPlugin.getInstance().getConfig().getInt("fupgrades.MainMenu.Chest.Chest-Size.level-1") * 9;
-                break;
-            case 2:
-                size = FactionsPlugin.getInstance().getConfig().getInt("fupgrades.MainMenu.Chest.Chest-Size.level-2") * 9;
-                break;
-            case 3:
-                size = FactionsPlugin.getInstance().getConfig().getInt("fupgrades.MainMenu.Chest.Chest-Size.level-3") * 9;
-                break;
-        }
         return size * 9;
     }
 
@@ -542,10 +487,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         return ItemStack.deserialize(bannerSerialized);
     }
 
-    public void setUpgrade(UpgradeType upgrade, int level) {
-        upgrades.put(upgrade.toString(), level);
-    }
-
     public int getWallCheckMinutes() {
         return this.wallCheckMinutes;
     }
@@ -572,16 +513,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
     public Map<UUID, Integer> getPlayerWallCheckCount() {
         return this.playerWallCheckCount;
-    }
-
-    @Override
-    public String getGuildId() {
-        return this.guildId;
-    }
-
-    @Override
-    public void setGuildId(String guildId) {
-        this.guildId = guildId;
     }
 
     @Override
@@ -1127,7 +1058,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         return !this.isPlayerFreeType() && fplayers.remove(fplayer);
     }
 
-
     public boolean addAltPlayer(FPlayer fplayer) {
         return !this.isPlayerFreeType() && alts.add(fplayer);
     }
@@ -1280,15 +1210,7 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         } else { // promote new faction admin
             if (oldLeader != null) oldLeader.setRole(Role.NORMAL);
             replacements.get(0).setRole(Role.LEADER);
-            if (Discord.useDiscord && replacements.get(0).discordSetup() && Discord.isInMainGuild(replacements.get(0).discordUser()) && Discord.mainGuild != null) {
-                Member m = Discord.mainGuild.getMember(replacements.get(0).discordUser());
-                if (Conf.factionRoles)
-                    Discord.mainGuild.getController().addSingleRoleToMember(m, Objects.requireNonNull(Discord.createFactionRole(this.getTag()))).queue();
-                if (Conf.leaderRoles)
-                    Discord.mainGuild.getController().addSingleRoleToMember(m, Discord.mainGuild.getRoleById(Conf.leaderRole)).queue();
-                if (Conf.factionDiscordTags)
-                    Discord.mainGuild.getController().setNickname(m, Discord.getNicknameString(replacements.get(0)));
-            }
+
             this.msg(TL.AUTOLEAVE_ADMIN_PROMOTED, oldLeader == null ? "" : oldLeader.getName(), replacements.get(0).getName());
             FactionsPlugin.getInstance().log("Faction " + this.getTag() + " (" + this.getId() + ") admin was removed. Replacement admin: " + replacements.get(0).getName());
         }
@@ -1321,15 +1243,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     public Map<FLocation, Set<String>> getClaimOwnership() {
         return claimOwnership;
     }
-
-
-    @Override
-    public Map<String, Mission> getMissions() {
-        return this.missions;
-    }
-
-    @Override
-    public List<String> getCompletedMissions() {return this.completedMissions;}
 
     public void clearAllClaimOwnership() {
         claimOwnership.clear();

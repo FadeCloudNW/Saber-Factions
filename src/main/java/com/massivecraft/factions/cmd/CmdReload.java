@@ -2,9 +2,7 @@ package com.massivecraft.factions.cmd;
 
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FactionsPlugin;
-import com.massivecraft.factions.discord.Discord;
 import com.massivecraft.factions.listeners.FactionsPlayerListener;
-import com.massivecraft.factions.shop.ShopConfig;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.zcore.util.TL;
 
@@ -26,10 +24,9 @@ public class CmdReload extends FCommand {
         long timeInitStart = System.currentTimeMillis();
         Conf.load();
         Conf.save();
-        ShopConfig.loadShop();
+
         FactionsPlugin.getInstance().reloadConfig();
         FactionsPlugin.getInstance().loadLang();
-
 
         if (FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight", false)) {
             FactionsPlugin.getInstance().factionsFlight = true;
@@ -39,7 +36,6 @@ public class CmdReload extends FCommand {
             FactionsPlayerListener.loadCorners();
         }
 
-        Discord.setupDiscord();
         //Recheck if commands should truly be disabled and rebuild.
         FCmdRoot.instance.addVariableCommands();
         FCmdRoot.instance.rebuild();

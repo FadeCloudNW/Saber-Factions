@@ -71,15 +71,19 @@ public class FactionsEntityListener implements Listener {
             if (Conf.worldsNoPowerLoss.contains(player.getWorld().getName())) {
                 powerLossEvent.setMessage(TL.PLAYER_POWER_LOSS_WARZONE.toString());
             }
+
         } else if (faction.isWilderness() && !Conf.wildernessPowerLoss && !Conf.worldsNoWildernessProtection.contains(player.getWorld().getName())) {
             powerLossEvent.setMessage(TL.PLAYER_POWER_NOLOSS_WILDERNESS.toString());
             powerLossEvent.setCancelled(true);
+
         } else if (Conf.worldsNoPowerLoss.contains(player.getWorld().getName())) {
             powerLossEvent.setMessage(TL.PLAYER_POWER_NOLOSS_WORLD.toString());
             powerLossEvent.setCancelled(true);
+
         } else if (Conf.peacefulMembersDisablePowerLoss && fplayer.hasFaction() && fplayer.getFaction().isPeaceful()) {
             powerLossEvent.setMessage(TL.PLAYER_POWER_NOLOSS_PEACEFUL.toString());
             powerLossEvent.setCancelled(true);
+
         } else {
             powerLossEvent.setMessage(TL.PLAYER_POWER_NOW.toString());
         }
@@ -90,9 +94,11 @@ public class FactionsEntityListener implements Listener {
         // Call player onDeath if the event is not cancelled and not using custom power
         if (!powerLossEvent.isCancelled() && !powerLossEvent.usingCustomPower()) {
             fplayer.onDeath();
+
         } else if (powerLossEvent.usingCustomPower() && !powerLossEvent.isCancelled()) {
             fplayer.alterPower(-powerLossEvent.getCustomPowerLost());
         }
+
         // Send the message from the powerLossEvent
         final String msg = powerLossEvent.getMessage();
         if (msg != null && !msg.isEmpty()) {

@@ -7,7 +7,9 @@ import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.FactionsPlugin;
 import com.massivecraft.factions.util.XMaterial;
+import com.massivecraft.factions.zcore.util.ItemBuilder;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -31,12 +33,13 @@ public class FDisbandFrame {
         this.gui = new Gui(FactionsPlugin.getInstance(), 1, "Confirm Disband");
     }
 
-    public void buildGUI(FPlayer fPlayer) {
+    public void buildGUI(FPlayer fPlayer, Faction faction) {
         int i;
         PaginatedPane pane = new PaginatedPane(0, 0, 9, this.gui.getRows());
         List<GuiItem> GUIItems = new ArrayList<>();
-        ItemStack confirm = buildConfirmDummyItem(fPlayer.getFaction());
+        ItemStack confirm = buildConfirmDummyItem(faction);
         ItemStack deny = buildDenyDummyItem();
+
         for (i = 0; i < 5; ++i) {
             GUIItems.add(new GuiItem(confirm, (e) -> {
                 e.setCancelled(true);
@@ -45,20 +48,19 @@ public class FDisbandFrame {
                 fPlayer.getPlayer().performCommand("f disband");
             }));
         }
+
         //Separator
         FileConfiguration config = FactionsPlugin.getInstance().getConfig();
-        ItemStack separatorItem = XMaterial.matchXMaterial(config.getString("f-disband-gui.separation-item.Type")).get().parseItem();
-        ItemMeta separatorMeta = separatorItem.getItemMeta();
-        separatorMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', config.getString("f-disband-gui.separation-item.Name")));
+
+        Material material = Material.getMaterial(config.getString("f-disband-gui.separation-item.Type"));
+        String name = config.getString("f-disband-gui.separation-item.Name").replaceAll("%faction%", faction.getTag());
         List<String> separatorLore = config.getStringList("f-disband-gui.separation-item.Lore");
-        if (separatorMeta.getLore() != null) separatorMeta.getLore().clear();
-        if (separatorLore != null) {
-            List<String> lore = new ArrayList<>();
-            for (String loreEntry : config.getStringList("f-disband-gui.separation-item.Lore")) {
-                lore.add(ChatColor.translateAlternateColorCodes('&', loreEntry));
-            }
-            separatorMeta.setLore(lore);
-        }
+
+        ItemStack separatorItem = new ItemBuilder(material, 0)
+                .setName(name)
+                .setLore(separatorLore)
+                .getStack();
+
         GUIItems.set(4, new GuiItem(separatorItem, (e) -> e.setCancelled(true)));
         //End Separator
 
@@ -101,5 +103,9 @@ public class FDisbandFrame {
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    private String color(String args) {
+        return ChatColor.translateAlternateColorCodes('&', args);
     }
 }

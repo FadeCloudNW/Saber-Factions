@@ -13,14 +13,10 @@ import com.massivecraft.factions.cmd.check.WeeWooTask;
 import com.massivecraft.factions.cmd.chest.AntiChestListener;
 import com.massivecraft.factions.cmd.reserve.ListParameterizedType;
 import com.massivecraft.factions.cmd.reserve.ReserveObject;
-import com.massivecraft.factions.discord.Discord;
-import com.massivecraft.factions.discord.DiscordListener;
 import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.integration.Worldguard;
 import com.massivecraft.factions.integration.dynmap.EngineDynmap;
 import com.massivecraft.factions.listeners.*;
-import com.massivecraft.factions.missions.MissionHandler;
-import com.massivecraft.factions.shop.ShopConfig;
 import com.massivecraft.factions.struct.ChatMode;
 import com.massivecraft.factions.struct.Relation;
 import com.massivecraft.factions.struct.Role;
@@ -31,7 +27,6 @@ import com.massivecraft.factions.zcore.MPlugin;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.Permissable;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
-import com.massivecraft.factions.zcore.fupgrades.UpgradesListener;
 import com.massivecraft.factions.zcore.util.TextUtil;
 import me.lucko.commodore.CommodoreProvider;
 import net.milkbowl.vault.economy.Economy;
@@ -94,7 +89,6 @@ public class FactionsPlugin extends MPlugin {
     private Worldguard wg;
     private FLogManager fLogManager;
     private List<ReserveObject> reserveObjects;
-
 
     public FactionsPlugin() {
         instance = this;
@@ -195,25 +189,27 @@ public class FactionsPlugin extends MPlugin {
             divider();
             return;
         }
-        //Update their config if needed
+        // Update their config if needed
         // Updater.updateIfNeeded(getConfig());
         RegisteredServiceProvider<Economy> rsp = FactionsPlugin.this.getServer().getServicesManager().getRegistration(Economy.class);
         com.massivecraft.factions.integration.Essentials.setup();
         hookedPlayervaults = setupPlayervaults();
+
         FPlayers.getInstance().load();
         Factions.getInstance().load();
 
         for (FPlayer fPlayer : FPlayers.getInstance().getAllFPlayers()) {
             Faction faction = Factions.getInstance().getFactionById(fPlayer.getFactionId());
+
             if (faction == null) {
                 log("Invalid faction id on " + fPlayer.getName() + ":" + fPlayer.getFactionId());
                 fPlayer.resetFactionData(false);
                 continue;
             }
+
             if (fPlayer.isAlt()) faction.addAltPlayer(fPlayer);
             else faction.addFPlayer(fPlayer);
         }
-
 
         Board.getInstance().load();
         Board.getInstance().clean();
@@ -260,10 +256,6 @@ public class FactionsPlugin extends MPlugin {
             this.getServer().getScheduler().runTaskTimer(this, CheckTask::cleanupTask, 0L, 1200L);
             this.getServer().getScheduler().runTaskTimerAsynchronously(this, new WeeWooTask(this), 600L, 600L);
         }
-        //Setup Discord Bot
-        new Discord(this);
-
-        ShopConfig.setup();
         fLogManager.loadLogs(this);
 
         getServer().getPluginManager().registerEvents(factionsPlayerListener = new FactionsPlayerListener(), this);
@@ -274,8 +266,6 @@ public class FactionsPlugin extends MPlugin {
                 new FactionsEntityListener(),
                 new FactionsExploitListener(),
                 new FactionsBlockListener(),
-                new UpgradesListener(),
-                new MissionHandler(this),
                 new FChestListener(),
                 new MenuListener(),
                 new AntiChestListener()
@@ -324,7 +314,6 @@ public class FactionsPlugin extends MPlugin {
     public SkriptAddon getSkriptAddon() {
         return skriptAddon;
     }
-
 
     private void setupPlaceholderAPI() {
         Plugin clip = getServer().getPluginManager().getPlugin("PlaceholderAPI");
@@ -433,28 +422,32 @@ public class FactionsPlugin extends MPlugin {
         try {
             String path = Paths.get(getDataFolder().getAbsolutePath()).toAbsolutePath().toString() + File.separator + "reserves.json";
             File file = new File(path);
+
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             }
+
             Files.write(Paths.get(file.getPath()),getGsonBuilder().create().toJson(reserveObjects).getBytes());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // only save data if plugin actually completely loaded successfully
-        if (this.loadSuccessful) Conf.saveSync();
-
 
         if (AutoLeaveTask != null) {
             this.getServer().getScheduler().cancelTask(AutoLeaveTask);
             AutoLeaveTask = null;
         }
-        DiscordListener.saveGuilds();
-        if (Discord.jda != null) {
-            Discord.jda.shutdownNow();
+
+        // only save data if plugin actually completely loaded successfully
+        if (this.loadSuccessful) {
+            Conf.saveSync();
+            //Factions.getInstance().forceSave();
+            //FPlayers.getInstance().forceSave();
+            //Board.getInstance().forceSave();
         }
         super.onDisable();
+
         try {
             fLogManager.saveLogs();
         } catch (Exception e) {

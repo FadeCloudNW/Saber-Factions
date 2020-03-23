@@ -591,8 +591,6 @@ public class FactionsPlayerListener implements Listener {
         if (me.isFlying() || !FactionsPlugin.instance.getConfig().getBoolean("ffly.AutoEnable")) return;
         me.setFFlying(true, false);
         CmdFly.flyMap.put(me.getName(), true);
-        if (CmdFly.particleTask == null)
-            CmdFly.startParticles();
     }
 
     //inspect

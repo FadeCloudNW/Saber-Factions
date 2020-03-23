@@ -84,11 +84,8 @@ public class UtilFly {
 
     public static void setFallDamage(FPlayer fp, boolean fly, boolean damage) {
         if (!fly) {
-            if (!damage) {
-                fp.sendMessage(TL.COMMAND_FLY_COOLDOWN.toString().replace("{amount}", FactionsPlugin.getInstance().getConfig().getInt("fly-falldamage-cooldown", 3) + ""));
-            }
-
             int cooldown = FactionsPlugin.getInstance().getConfig().getInt("fly-falldamage-cooldown", 3);
+
             if (cooldown > 0) {
                 fp.setTakeFallDamage(false);
                 Bukkit.getScheduler().runTaskLater(FactionsPlugin.getInstance(), () -> fp.setTakeFallDamage(true), 20L * cooldown);

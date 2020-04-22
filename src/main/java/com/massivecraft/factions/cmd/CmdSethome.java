@@ -37,17 +37,22 @@ public class CmdSethome extends FCommand {
             }
 
             // Can the player set the faction home HERE?
-            if (!Permission.BYPASS.has(context.player) &&
-                    Conf.homesMustBeInClaimedTerritory &&
-                    Board.getInstance().getFactionAt(new FLocation(context.player)) != faction) {
-                context.msg(TL.COMMAND_SETHOME_NOTCLAIMED);
-                return;
+            boolean canSetHomeHere = Conf.homesMustBeInClaimedTerritory && Board.getInstance().getFactionAt(new FLocation(context.player)).equals(faction);
+
+            if (!Permission.BYPASS.has(context.player)) {
+
+                if (!canSetHomeHere) {
+                    context.msg(TL.COMMAND_SETHOME_NOTCLAIMED);
+                    return;
+                }
             }
 
             if (!context.args.isEmpty()) {
                 Faction target = context.argAsFaction(0);
                 if (target == null) return;
+
                 context.faction = target;
+
                 if (target.getAccess(context.fPlayer, PermissableAction.SETHOME) != Access.ALLOW) {
                     context.fPlayer.msg(TL.GENERIC_FPERM_NOPERMISSION, "set faction home");
                     return;

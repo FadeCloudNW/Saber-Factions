@@ -56,15 +56,12 @@ import java.util.stream.Collectors;
 
 public class FactionsPlugin extends MPlugin {
 
-    // Our single plugin instance.
-    // Single 4 life.
     public static FactionsPlugin instance;
     public static Permission perms = null;
-    // This plugin sets the boolean true when fully enabled.
-    // Plugins can check this boolean while hooking in have
-    // a green light to use the api.
+
     public static boolean startupFinished = false;
     public boolean PlaceholderApi;
+
     // Commands
     public FCmdRoot cmdBase;
     public CmdAutoHelp cmdAutoHelp;
@@ -76,7 +73,6 @@ public class FactionsPlugin extends MPlugin {
     public boolean mc115 = false;
     public boolean useNonPacketParticles = false;
     public boolean factionsFlight = false;
-    SkriptAddon skriptAddon;
     private FactionsPlayerListener factionsPlayerListener;
     private boolean locked = false;
     private boolean spam = false;
@@ -167,8 +163,10 @@ public class FactionsPlugin extends MPlugin {
         migrateFPlayerLeaders();
         log("==== End Setup ====");
 
-        if (!preEnable()) return;
-        this.loadSuccessful = false;
+        if (!preEnable()) {
+            this.loadSuccessful = false;
+            return;
+        }
 
         if (!new File(this.getDataFolder() + "/config.yml").exists()) {
             this.saveResource("config.yml", false);
@@ -236,16 +234,6 @@ public class FactionsPlugin extends MPlugin {
 
         if (getConfig().getBoolean("enable-faction-flight")) factionsFlight = true;
 
-        if (getServer().getPluginManager().getPlugin("Skript") != null) {
-            log("Skript was found! Registering FactionsPlugin Addon...");
-            skriptAddon = Skript.registerAddon(this);
-            try {
-                skriptAddon.loadClasses("com.massivecraft.factions.skript", "expressions");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            log("Skript addon registered!");
-        }
         if (Conf.useCheckSystem) {
             int minute = 1200;
             this.getServer().getScheduler().runTaskTimerAsynchronously(this, new CheckTask(this, 3), 0L, minute * 3);
@@ -309,10 +297,6 @@ public class FactionsPlugin extends MPlugin {
         this.loadSuccessful = true;
         // Set startup finished to true. to give plugins hooking in a greenlight
         FactionsPlugin.startupFinished = true;
-    }
-
-    public SkriptAddon getSkriptAddon() {
-        return skriptAddon;
     }
 
     private void setupPlaceholderAPI() {

@@ -379,11 +379,6 @@ public abstract class MemoryBoard extends Board {
 
         public void removeFaction(String factionId) {
             Collection<FLocation> fLocations = factionToLandMap.removeAll(factionId);
-            for (FPlayer fPlayer : FPlayers.getInstance().getOnlinePlayers()) {
-                if (fLocations.contains(fPlayer.getLastStoodAt()) && !fPlayer.isAdminBypassing() && fPlayer.isFlying()) {
-                    fPlayer.setFlying(false);
-                }
-            }
             for (FLocation floc : fLocations) {
                 super.remove(floc);
             }

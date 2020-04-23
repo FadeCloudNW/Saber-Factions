@@ -97,25 +97,15 @@ public class CmdDisband extends FCommand {
                     if (follower.getFaction() == faction) {
                         follower.msg(TL.COMMAND_DISBAND_BROADCAST_YOURS, amountString);
 
-                        if (!follower.canFlyAtLocation() && FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight")) {
-                            follower.setFFlying(false, false);
-                        }
-
                     } else {
                         follower.msg(TL.COMMAND_DISBAND_BROADCAST_NOTYOURS, amountString, faction.getTag(follower));
                     }
                 }
 
-                if (FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight"))
-                    context.fPlayer.setFFlying(false, false);
             } else {
                 context.player.sendMessage(String.valueOf(TL.COMMAND_DISBAND_PLAYER));
             }
             faction.disband(context.player, PlayerDisbandReason.COMMAND);
-
-            if (!context.fPlayer.canFlyAtLocation() && FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight")) {
-                context.fPlayer.setFFlying(false, false);
-            }
         }
     }
 

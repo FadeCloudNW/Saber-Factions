@@ -142,7 +142,6 @@ public enum TL {
     COMMAND_ADMIN_DEMOTES("&c&l[!] &cYou have demoted &7%1$s &cfrom the position of faction admin."),
     COMMAND_ADMIN_DEMOTED("&c&l[!] &cYou have been demoted from the position of faction admin by &7%1$s&c"),
     COMMAND_ADMIN_PROMOTES("&e&l[!] &eYou have promoted &6%1$s &eto the position of faction admin."),
-    COMMAND_ADMIN_PROMOTED("&e&l[!] &6%1$s &egave &6%2$s &ethe leadership of &6%3$s&e."),
     COMMAND_ADMIN_DESCRIPTION("Hand over your admin rights"),
     COMMAND_ADMIN_NOMEMBERS("&e&l[!] &cNo one else to promote, please disband faction."),
 

@@ -1,7 +1,5 @@
 package com.massivecraft.factions;
 
-import ch.njol.skript.Skript;
-import ch.njol.skript.SkriptAddon;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.massivecraft.factions.cmd.*;

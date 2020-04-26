@@ -68,11 +68,12 @@ public class CmdUnclaimall extends FCommand {
             }
         }
 
-        LandUnclaimAllEvent unclaimAllEvent = new LandUnclaimAllEvent(target, context.fPlayer);
-        Bukkit.getScheduler().runTask(FactionsPlugin.getInstance(), () -> Bukkit.getServer().getPluginManager().callEvent(unclaimAllEvent));
-        if (unclaimAllEvent.isCancelled()) {
+        LandUnclaimAllEvent unClaimAllEvent = new LandUnclaimAllEvent(target, context.fPlayer);
+        Bukkit.getPluginManager().callEvent(unClaimAllEvent);
+
+        if (unClaimAllEvent.isCancelled())
             return;
-        }
+
         int unclaimed = target.getAllClaims().size();
 
 

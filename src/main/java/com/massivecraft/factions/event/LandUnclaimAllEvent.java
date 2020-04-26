@@ -1,9 +1,12 @@
 package com.massivecraft.factions.event;
 
+import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+
+import java.util.Set;
 
 public class LandUnclaimAllEvent extends FactionPlayerEvent implements Cancellable {
 
@@ -11,9 +14,15 @@ public class LandUnclaimAllEvent extends FactionPlayerEvent implements Cancellab
      * @author FactionsUUID Team
      */
     private boolean cancelled;
+    private Set<FLocation> claims;
 
-    public LandUnclaimAllEvent(Faction f, FPlayer p) {
-        super(f, p);
+    public LandUnclaimAllEvent(Faction faction, FPlayer fPlayer, Set<FLocation> claims) {
+        super(faction, fPlayer);
+        this.claims = claims;
+    }
+
+    public Set<FLocation> getClaims() {
+        return claims;
     }
 
     /**

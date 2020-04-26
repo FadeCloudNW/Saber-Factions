@@ -14,6 +14,9 @@ import com.massivecraft.factions.zcore.fperms.PermissableAction;
 import com.massivecraft.factions.zcore.util.TL;
 import org.bukkit.Bukkit;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class CmdUnclaimall extends FCommand {
 
     /**
@@ -68,7 +71,8 @@ public class CmdUnclaimall extends FCommand {
             }
         }
 
-        LandUnclaimAllEvent unClaimAllEvent = new LandUnclaimAllEvent(target, context.fPlayer);
+        Set<FLocation> claims = new HashSet<>(target.getAllClaims());
+        LandUnclaimAllEvent unClaimAllEvent = new LandUnclaimAllEvent(target, context.fPlayer, claims);
         Bukkit.getPluginManager().callEvent(unClaimAllEvent);
 
         if (unClaimAllEvent.isCancelled())

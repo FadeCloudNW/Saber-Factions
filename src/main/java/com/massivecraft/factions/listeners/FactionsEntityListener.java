@@ -194,7 +194,6 @@ public class FactionsEntityListener implements Listener {
             }
             if (damagee != null && damagee instanceof Player) {
                 cancelFStuckTeleport((Player) damagee);
-                cancelFFly((Player) damagee);
                 FPlayer fplayer = FPlayers.getInstance().getByPlayer((Player) damagee);
                 if (fplayer.isInspectMode()) {
                     fplayer.setInspectMode(false);
@@ -203,7 +202,6 @@ public class FactionsEntityListener implements Listener {
             }
             if (damager instanceof Player) {
                 cancelFStuckTeleport((Player) damager);
-                cancelFFly((Player) damager);
                 FPlayer fplayer = FPlayers.getInstance().getByPlayer((Player) damager);
                 if (fplayer.isInspectMode()) {
                     fplayer.setInspectMode(false);
@@ -213,12 +211,6 @@ public class FactionsEntityListener implements Listener {
         } else if (Conf.safeZonePreventAllDamageToPlayers && isPlayerInSafeZone(event.getEntity())) {
             // Players can not take any damage in a Safe Zone
             event.setCancelled(true);
-        } else if (event.getCause() == EntityDamageEvent.DamageCause.FALL && event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
-            if (fPlayer != null && !fPlayer.shouldTakeFallDamage()) {
-                event.setCancelled(true); // Falling after /f fly
-            }
         }
 
         // entity took generic damage?
@@ -232,12 +224,6 @@ public class FactionsEntityListener implements Listener {
                 me.msg(TL.WARMUPS_CANCELLED);
             }
         }
-    }
-
-    private void cancelFFly(Player player) {
-        if (player == null) return;
-        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
-        if (fPlayer.isFlying()) fPlayer.setFFlying(false, true);
     }
 
     public void cancelFStuckTeleport(Player player) {
@@ -693,11 +679,6 @@ public class FactionsEntityListener implements Listener {
                     if (fvictim.getRelationTo(fdamager) == Relation.TRUCE) {
                         fdamager.msg(TL.PLAYER_PVP_CANTHURT, fvictim.describeTo(fdamager));
                         e.setCancelled(true);
-                    }
-                    if (fvictim.getRelationTo(fdamager) == Relation.ENEMY) {
-                        if (fvictim.isFlying()) {
-                            fvictim.setFFlying(false, true);
-                        }
                     }
                 }
             }

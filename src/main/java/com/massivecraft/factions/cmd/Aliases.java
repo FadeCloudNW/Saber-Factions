@@ -36,10 +36,6 @@ public class Aliases {
     public static ArrayList<String> money_withdraw = new ArrayList<>(Arrays.asList("w", "withdraw"));
     public static ArrayList<String> grace = new ArrayList<>(Collections.singletonList("grace"));
     public static ArrayList<String> logout = new ArrayList<>(Collections.singletonList("logout"));
-    public static ArrayList<String> points_points = new ArrayList<>(Collections.singletonList("points"));
-    public static ArrayList<String> points_add = new ArrayList<>(Collections.singletonList("add"));
-    public static ArrayList<String> points_remove = new ArrayList<>(Collections.singletonList("remove"));
-    public static ArrayList<String> points_set = new ArrayList<>(Collections.singletonList("set"));
     public static ArrayList<String> relation_ally = new ArrayList<>(Collections.singletonList("ally"));
     public static ArrayList<String> relation_enemy = new ArrayList<>(Collections.singletonList("enemy"));
     public static ArrayList<String> relation_neutral = new ArrayList<>(Collections.singletonList("neutral"));
@@ -49,7 +45,6 @@ public class Aliases {
     public static ArrayList<String> roles_promote = new ArrayList<>(Collections.singletonList("promote"));
     public static ArrayList<String> tnt_tnt = new ArrayList<>(Collections.singletonList("tnt"));
     public static ArrayList<String> tnt_tntfill = new ArrayList<>(Collections.singletonList("tntfill"));
-    public static ArrayList<String> wild = new ArrayList<>(Collections.singletonList("wild"));
     public static ArrayList<String> admin = new ArrayList<>(Arrays.asList("admin", "setadmin", "leader", "setleader"));
     public static ArrayList<String> ahome = new ArrayList<>(Collections.singletonList("ahome"));
     public static ArrayList<String> announce = new ArrayList<>(Arrays.asList("ann", "announce"));
@@ -139,7 +134,6 @@ public class Aliases {
     public static ArrayList<String> top = new ArrayList<>(Arrays.asList("t", "top"));
     public static ArrayList<String> tpBanner = new ArrayList<>(Collections.singletonList("tpbanner"));
     public static ArrayList<String> unban = new ArrayList<>(Collections.singletonList("unban"));
-    public static ArrayList<String> upgrades = new ArrayList<>(Arrays.asList("upgrades", "upgrade"));
     public static ArrayList<String> vault = new ArrayList<>(Collections.singletonList("vault"));
     public static ArrayList<String> viewChest = new ArrayList<>(Arrays.asList("viewchest", "viewpv"));
     private static transient Aliases i = new Aliases();

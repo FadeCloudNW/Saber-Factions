@@ -31,19 +31,6 @@ public interface FPlayer extends EconomyParticipator {
     boolean hasNotificationsEnabled();
 
     /**
-     * Determine if a player has enemies nearby based on the enemy check task in CmdFly
-     * NOTE: THIS VALUE IS ONLY UPDATED WHEN A USER IS USING FLY
-     * @return enemiesNearby as a boolean
-     */
-    boolean hasEnemiesNearby();
-
-    /**
-     * Set if this FPlayer has an enemy nearby
-     * @param b enemiesNearby
-     */
-    void setEnemiesNearby(Boolean b);
-
-    /**
      * Used to check if this player should be served titles
      * @return if this FPlayer has titles enabled as a boolean
      */
@@ -142,10 +129,6 @@ public interface FPlayer extends EconomyParticipator {
     Role getRole();
 
     void setRole(Role role);
-
-    boolean shouldTakeFallDamage();
-
-    void setTakeFallDamage(boolean fallDamage);
 
     double getPowerBoost();
 
@@ -252,23 +235,6 @@ public interface FPlayer extends EconomyParticipator {
     boolean isInspectMode();
 
     void setInspectMode(boolean status);
-
-
-    // Fly Checks
-
-    Boolean canflyinWilderness();
-
-    Boolean canflyinWarzone();
-
-    Boolean canflyinSafezone();
-
-    Boolean canflyinEnemy();
-
-    Boolean canflyinAlly();
-
-    Boolean canflyinTruce();
-
-    Boolean canflyinNeutral();
 
     // -------------------------------
     // Relation and relation colors
@@ -390,23 +356,11 @@ public interface FPlayer extends EconomyParticipator {
 
     boolean isOffline();
 
-    boolean isFlying();
-
-    void setFlying(boolean fly);
-
-    void setFFlying(boolean fly, boolean damage);
-
-    boolean canFlyAtLocation();
-
-    boolean canFlyAtLocation(FLocation location);
-
     boolean isEnteringPassword();
 
     void setEnteringPassword(boolean toggle, String warp);
 
     String getEnteringWarp();
-
-    boolean checkIfNearbyEnemies();
 
     int getCooldown(String cmd);
 

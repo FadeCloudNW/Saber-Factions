@@ -6,8 +6,8 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.util.ItemBuilder;
 import com.massivecraft.factions.util.XMaterial;
-import com.massivecraft.factions.zcore.util.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -57,9 +57,9 @@ public class FDisbandFrame {
         List<String> separatorLore = config.getStringList("f-disband-gui.separation-item.Lore");
 
         ItemStack separatorItem = new ItemBuilder(material, 0)
-                .setName(name)
-                .setLore(separatorLore)
-                .getStack();
+                .name(name)
+                .lore(separatorLore)
+                .build();
 
         GUIItems.set(4, new GuiItem(separatorItem, (e) -> e.setCancelled(true)));
         //End Separator

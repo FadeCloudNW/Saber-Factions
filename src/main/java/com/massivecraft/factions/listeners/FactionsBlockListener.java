@@ -28,7 +28,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -503,7 +502,7 @@ public class FactionsBlockListener implements Listener {
 
         if (isSpawner) {
             Access access = fme.getFaction().getAccess(fme, PermissableAction.SPAWNER);
-
+            System.out.println("test");
             if (access != Access.ALLOW && fme.getRole() != Role.LEADER) {
                 fme.msg(TL.GENERIC_FPERM_NOPERMISSION, "mine spawners");
                 event.setCancelled(true);

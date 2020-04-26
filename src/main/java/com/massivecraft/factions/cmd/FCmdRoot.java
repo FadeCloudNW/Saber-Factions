@@ -124,6 +124,7 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
     public CmdNear cmdNear = new CmdNear();
     public CmdVault cmdVault = new CmdVault();
     public CmdGetVault cmdGetVault = new CmdGetVault();
+    public CmdFly cmdFly = new CmdFly();
     public CmdColeader cmdColeader = new CmdColeader();
     public CmdBanner cmdBanner = new CmdBanner();
     public CmdTpBanner cmdTpBanner = new CmdTpBanner();
@@ -340,6 +341,10 @@ public class FCmdRoot extends FCommand implements CommandExecutor {
         if (FactionsPlugin.getInstance().getConfig().getBoolean("ffocus.Enabled") && !fFocusEnabled) {
             addSubCommand(this.cmdFocus);
             fFocusEnabled = true;
+        }
+        if (FactionsPlugin.getInstance().getConfig().getBoolean("enable-faction-flight", false) && !fFlyEnabled) {
+            this.addSubCommand(this.cmdFly);
+            fFlyEnabled = true;
         }
     }
 

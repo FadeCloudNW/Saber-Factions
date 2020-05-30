@@ -1,7 +1,6 @@
 package com.massivecraft.factions.zcore.persist;
 
 import com.massivecraft.factions.*;
-import com.massivecraft.factions.cmd.CmdFly;
 import com.massivecraft.factions.cmd.audit.FLogType;
 import com.massivecraft.factions.event.*;
 import com.massivecraft.factions.event.FactionDisbandEvent.PlayerDisbandReason;
@@ -26,7 +25,6 @@ import mkremins.fanciful.FancyMessage;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
@@ -70,7 +68,6 @@ public abstract class MemoryFPlayer implements FPlayer {
     protected int kills, deaths;
     protected boolean willAutoLeave = true;
     protected int mapHeight = 8; // default to old value
-    protected boolean isFlying = false;
     protected boolean enteringPassword = false;
     protected String enteringPasswordWarp = "";
     protected transient FLocation lastStoodAt = new FLocation(); // Where did this player stand the last time we checked?
@@ -80,7 +77,6 @@ public abstract class MemoryFPlayer implements FPlayer {
     protected transient boolean autoWarZoneEnabled;
     protected transient boolean loginPvpDisabled;
     protected transient long lastFrostwalkerMessage;
-    protected transient boolean shouldTakeFallDamage = true;
     protected boolean isStealthEnabled = false;
     protected boolean notificationsEnabled = true;
     protected boolean titlesEnabled = true;
@@ -755,13 +751,9 @@ public abstract class MemoryFPlayer implements FPlayer {
         }
         this.resetFactionData();
         FactionsPlugin.instance.logFactionEvent(myFaction, FLogType.INVITES, this.getName(), CC.Red + "left", "the faction");
-        setFlying(false);
+
         if (myFaction.isNormal() && !perm && myFaction.getFPlayers().isEmpty()) {
             // Remove this faction
-            for (FPlayer fplayer : FPlayers.getInstance().getOnlinePlayers())
-                fplayer.msg(TL.LEAVE_DISBANDED, myFaction.describeTo(fplayer, true));
-
-
             FactionDisbandEvent disbandEvent = new FactionDisbandEvent(getPlayer(), myFaction.getId(), PlayerDisbandReason.LEAVE);
             Bukkit.getPluginManager().callEvent(disbandEvent);
 
@@ -889,76 +881,20 @@ public abstract class MemoryFPlayer implements FPlayer {
         return !isOnline();
     }
 
-    public boolean isFlying() {
-        return isFlying;
-    }
-
-    public void setFlying(boolean fly) {
-        setFFlying(fly, false);
-    }
-
-    public void setFFlying(boolean fly, boolean damage) {
-        Player player = getPlayer();
-        if (player == null) return;
-
-        player.setAllowFlight(fly);
-        player.setFlying(fly);
-
-        if (!damage) {
-            msg(TL.COMMAND_FLY_CHANGE, fly ? "enabled" : "disabled");
-
-        } else {
-            msg(TL.COMMAND_FLY_DAMAGE);
-        }
-
-        // If leaving fly mode, don't let them take fall damage for x seconds.
-        if (!fly) {
-            int cooldown = FactionsPlugin.getInstance().getConfig().getInt("fly-falldamage-cooldown", 3);
-            CmdFly.flyMap.remove(player.getName());
-
-            // If the value is 0 or lower, make them take fall damage.
-            // Otherwise, start a timer and have this cancel after a few seconds.
-            // Short task so we're just doing it in method. Not clean but eh.
-            if (cooldown > 0) {
-                setTakeFallDamage(false);
-                Bukkit.getScheduler().runTaskLater(FactionsPlugin.getInstance(), () -> setTakeFallDamage(true), 20L * cooldown);
-            }
-        }
-        isFlying = fly;
-    }
-
     public boolean isInFactionsChest() {
         return inChest;
     }
+
     public void setInFactionsChest(boolean b) {
         inChest = b;
     }
+
     public boolean isInVault() {
         return inVault;
     }
 
     public void setInVault(boolean status) {
         inVault = status;
-    }
-
-    public boolean canFlyAtLocation() {
-        return canFlyAtLocation(lastStoodAt);
-    }
-
-    public boolean canFlyAtLocation(FLocation location) {
-        Faction faction = Board.getInstance().getFactionAt(location);
-        if ((faction == getFaction() && getRole() == Role.LEADER) || isAdminBypassing) return true;
-        if (faction.isSystemFaction()) return CmdFly.checkFly(this, getPlayer(), faction);
-        Access access = faction.getAccess(this, PermissableAction.FLY);
-        return access == null || access == Access.UNDEFINED || access == Access.ALLOW;
-    }
-
-    public boolean shouldTakeFallDamage() {
-        return this.shouldTakeFallDamage;
-    }
-
-    public void setTakeFallDamage(boolean fallDamage) {
-        this.shouldTakeFallDamage = fallDamage;
     }
 
     public boolean isEnteringPassword() {
@@ -1064,74 +1000,6 @@ public abstract class MemoryFPlayer implements FPlayer {
         if (this.warmup != null) this.clearWarmup();
         this.warmup = warmup;
         this.warmupTask = taskId;
-    }
-
-    @Override
-    public boolean checkIfNearbyEnemies() {
-        Player me = this.getPlayer();
-
-        if (me == null) return false;
-        int radius = Conf.stealthFlyCheckRadius;
-        for (Entity e : me.getNearbyEntities(radius, 255, radius)) {
-            if (e == null) continue;
-            if (e instanceof Player) {
-                Player eplayer = (((Player) e).getPlayer());
-                if (eplayer == null) continue;
-                FPlayer efplayer = FPlayers.getInstance().getByPlayer(eplayer);
-                if (efplayer == null) continue;
-                if (efplayer.isVanished()) continue;
-                if (this.getRelationTo(efplayer).equals(Relation.ENEMY) && !efplayer.isStealthEnabled()) {
-                    setFlying(false);
-                    msg(TL.COMMAND_FLY_ENEMY_NEAR);
-                    Bukkit.getServer().getPluginManager().callEvent(new FPlayerStoppedFlying(this));
-                    this.enemiesNearby = true;
-                    return true;
-                }
-            }
-        }
-        this.enemiesNearby = false;
-        return false;
-    }
-
-    @Override
-    public Boolean canflyinWilderness() {
-        return getPlayer().hasPermission(Permission.FLY_WILDERNESS.node);
-    }
-
-    @Override
-    public Boolean canflyinWarzone() {
-        return getPlayer().hasPermission(Permission.FLY_WARZONE.node);
-
-    }
-
-    @Override
-    public Boolean canflyinSafezone() {
-        return getPlayer().hasPermission(Permission.FLY_SAFEZONE.node);
-
-    }
-
-    @Override
-    public Boolean canflyinEnemy() {
-        return getPlayer().hasPermission(Permission.FLY_ENEMY.node);
-
-    }
-
-    @Override
-    public Boolean canflyinAlly() {
-        return getPlayer().hasPermission(Permission.FLY_ALLY.node);
-
-    }
-
-    @Override
-    public Boolean canflyinTruce() {
-        return getPlayer().hasPermission(Permission.FLY_TRUCE.node);
-
-    }
-
-    @Override
-    public Boolean canflyinNeutral() {
-        return getPlayer().hasPermission(Permission.FLY_NEUTRAL.node);
-
     }
 
     @Override

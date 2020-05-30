@@ -84,13 +84,6 @@ public class CmdAdmin extends FCommand {
             context.msg(TL.COMMAND_ADMIN_PROMOTES, fyou.describeTo(context.fPlayer, true));
 
             FactionsPlugin.instance.getFlogManager().log(targetFaction, FLogType.RANK_EDIT, context.fPlayer.getName(), fyou.getName(), ChatColor.RED + "Admin");
-
-            // Inform all players
-            for (FPlayer fplayer : FPlayers.getInstance().getOnlinePlayers()) {
-                fplayer.msg(TL.COMMAND_ADMIN_PROMOTED,
-                        context.player == null ? TL.GENERIC_SERVERADMIN.toString() : context.fPlayer.describeTo(fplayer, true),
-                        fyou.describeTo(fplayer), targetFaction.describeTo(fplayer));
-            }
         });
     }
 

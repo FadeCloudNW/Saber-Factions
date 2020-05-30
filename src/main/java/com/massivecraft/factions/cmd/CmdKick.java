@@ -75,7 +75,6 @@ public class CmdKick extends FCommand {
         }
 
         if (toKick.isAlt()) {
-            System.out.println("3");
             context.sendMessage("&c&l[!] &7To kick alt members: &c/f alt kick <player>");
             return;
         }

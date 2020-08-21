@@ -687,7 +687,6 @@ public class FactionsEntityListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         // only need to check for item frames
-        if (event.getRightClicked() == null) return;
         if (!event.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) return;
 
         if (!FactionsBlockListener.playerCanBuildDestroyBlock(event.getPlayer(), event.getRightClicked().getLocation(), "build", false)) {

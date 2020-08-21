@@ -122,6 +122,7 @@ public class CmdUnclaim extends FCommand {
         if (context.fPlayer.isAdminBypassing()) {
             LandUnclaimEvent unclaimEvent = new LandUnclaimEvent(target, targetFaction, context.fPlayer);
             Bukkit.getServer().getPluginManager().callEvent(unclaimEvent);
+
             if (unclaimEvent.isCancelled()) {
                 return false;
             }
@@ -161,7 +162,8 @@ public class CmdUnclaim extends FCommand {
 
 
         LandUnclaimEvent unclaimEvent = new LandUnclaimEvent(target, targetFaction, context.fPlayer);
-        Bukkit.getScheduler().runTask(FactionsPlugin.getInstance(), () -> Bukkit.getServer().getPluginManager().callEvent(unclaimEvent));
+        Bukkit.getServer().getPluginManager().callEvent(unclaimEvent);
+
         if (unclaimEvent.isCancelled()) {
             return false;
         }

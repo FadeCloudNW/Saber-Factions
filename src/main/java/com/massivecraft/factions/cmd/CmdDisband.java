@@ -88,8 +88,7 @@ public class CmdDisband extends FCommand {
             Bukkit.getScheduler().scheduleSyncDelayedTask(FactionsPlugin.getInstance(), () -> disbandMap.remove(context.player.getUniqueId().toString()), 200L);
 
         } else if (faction.getId().equals(disbandMap.get(context.player.getUniqueId().toString())) || faction.getTnt() == 0) {
-
-            if (FactionsPlugin.getInstance().getConfig().getBoolean("faction-disband-broadcast", true)) {
+            /**if (FactionsPlugin.getInstance().getConfig().getBoolean("faction-disband-broadcast", true)) {
 
                 for (FPlayer follower : FPlayers.getInstance().getOnlinePlayers()) {
                     String amountString = context.sender instanceof ConsoleCommandSender ? TL.GENERIC_SERVERADMIN.toString() : context.fPlayer.describeTo(follower);
@@ -104,7 +103,7 @@ public class CmdDisband extends FCommand {
 
             } else {
                 context.player.sendMessage(String.valueOf(TL.COMMAND_DISBAND_PLAYER));
-            }
+            }**/
             faction.disband(context.player, PlayerDisbandReason.COMMAND);
         }
     }

@@ -1,6 +1,7 @@
 package com.massivecraft.factions.zcore.persist;
 
 import com.massivecraft.factions.*;
+import com.massivecraft.factions.cmd.CommandContext;
 import com.massivecraft.factions.event.FPlayerLeaveEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent.PlayerDisbandReason;
@@ -320,6 +321,7 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
         FactionDisbandEvent disbandEvent = new FactionDisbandEvent(disbander, this.getId(), reason);
         Bukkit.getServer().getPluginManager().callEvent(disbandEvent);
+
         if (disbandEvent.isCancelled()) {
             return;
         }
@@ -350,6 +352,11 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
                     FactionsPlugin.getInstance().log(fdisbander.getName() + " has been given bank holdings of " + amountString + " from disbanding " + this.getTag() + ".");
                 }
             }
+        }
+
+
+        if (disbander != null) {
+            disbander.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e&l(!) &eYou disbanded your faction."));
         }
 
         Factions.getInstance().removeFaction(this.getId());

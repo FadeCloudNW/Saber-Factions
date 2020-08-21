@@ -9,13 +9,14 @@ import java.util.Set;
 
 
 public abstract class Board {
+
     protected static Board instance = getBoardImpl();
 
     private static Board getBoardImpl() {
-        switch (Conf.backEnd) {
-            case JSON:
-                return new JSONBoard();
+        if (Conf.backEnd == Conf.Backend.JSON) {
+            return new JSONBoard();
         }
+
         return null;
     }
 

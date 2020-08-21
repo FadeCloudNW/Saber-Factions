@@ -47,8 +47,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FactionsBlockListener implements Listener {
 
     public static HashMap<String, Location> bannerLocations = new HashMap<>();
-    private HashMap<String, Boolean> bannerCooldownMap = new HashMap<>();
-    private long placeTimer = TimeUnit.SECONDS.toMillis(15L);
+    private final HashMap<String, Boolean> bannerCooldownMap = new HashMap<>();
+    private final long placeTimer = TimeUnit.SECONDS.toMillis(15L);
 
 
     public static boolean playerCanBuildDestroyBlock(Player player, Location location, String action, boolean justCheck) {
